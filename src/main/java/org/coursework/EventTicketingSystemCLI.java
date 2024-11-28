@@ -1,19 +1,23 @@
 package org.coursework;
 
+import org.coursework.controller.CustomerController;
 import org.coursework.controller.EventTicketingController;
+import org.coursework.controller.VendorController;
+import org.coursework.service.CustomerService;
 import org.coursework.service.EventTicketingService;
-
-import java.util.Scanner;
+import org.coursework.service.VendorService;
+import org.coursework.utils.InputValidator;
 
 public class EventTicketingSystemCLI {
-    //import scanner
-    private static final Scanner scanner = new Scanner(System.in);;
     private static final EventTicketingController eventTicketingController = new EventTicketingController(new EventTicketingService());
+    private static final VendorController vendorController = new VendorController(new VendorService());
+    private static final CustomerController customerController = new CustomerController(new CustomerService());
+
     public static void main(String[] args) {
         //print welcome message
         System.out.println("=".repeat(50));
         System.out.println("*** Welcome to the Event Ticketing System! ***");
-        System.out.println("=".repeat(50)+"\n");
+        System.out.println("=".repeat(50) + "\n");
         while (true) {
             //print menu
             System.out.println("-".repeat(50));
@@ -30,7 +34,7 @@ public class EventTicketingSystemCLI {
             System.out.print("Please enter your option:");
 
             //get user input
-            int option = validateOptionNumberInput();
+            int option = InputValidator.validateOptionNumberInput();
 
             //switch case for user input
             switch (option) {
@@ -40,6 +44,10 @@ public class EventTicketingSystemCLI {
                 case 4 -> displayCustomerManagementMenu();
                 case 0 -> {
                     System.out.println("Exiting System...");
+                    InputValidator.closeScanner();
+                    System.out.println("=".repeat(50));
+                    System.out.println("*** Thank you for using the Event Ticketing System! ***");
+                    System.out.println("=".repeat(50));
                     System.exit(0);
                 }
                 default -> System.out.println("Invalid Option. Please try again.");
@@ -65,7 +73,7 @@ public class EventTicketingSystemCLI {
             System.out.println("-".repeat(50));
             System.out.print(" Please select an option(Please enter M to return to the main menu): ");
 
-            String option = scanner.next().toLowerCase();
+            String option = InputValidator.validateOptionAlphabetInput("abcdm");
 
             switch (option) {
                 case "a" -> {
@@ -90,150 +98,179 @@ public class EventTicketingSystemCLI {
 
     //display ticket management menu
     private static void displayTicketManagementMenu() {
-        System.out.println("_".repeat(50));
-        System.out.println("*** Ticket Management Menu ***");
-        System.out.println("_".repeat(50) + "\n");
-        System.out.println("""
-                    a. View Event Ticket Status
-                    b. View Vendor Ticket Status
-                    c. View Customer Ticket Status
-                    d. Get Ticket by ID
-                    e. Delete Ticket
+        while (true) {
+            System.out.println("_".repeat(50));
+            System.out.println("*** Ticket Management Menu ***");
+            System.out.println("_".repeat(50) + "\n");
+            System.out.println("""
+                    a. View total tickets available
+                    b. View total tickets sold
+                    c. find total tickets purchased by a customer
+                    d. find total tickets sold by a vendor
+                    e. View all Ticket Status
+                    f. Delete a Ticket for a Customer
                     m. Back to Main Menu
                     """);
-        System.out.println("_".repeat(50));
-        System.out.println("Please select an option(Please enter M to return to the main menu): ");
+            System.out.println("_".repeat(50));
+            System.out.print("Please select an option(Please enter M to return to the main menu): ");
 
-        String option = validateOptionAlphabetInput("abcdem");
+            String option = InputValidator.validateOptionAlphabetInput("abcdefgm");
 
-        switch (option) {
-            case "a" -> {
-                System.out.println("Viewing Event Ticket Status...");
-
+            switch (option) {
+                case "a" -> {
+                    System.out.println("Viewing total tickets available...");
+                    eventTicketingController.viewTotalTicketsAvailable();
+                }
+                case "b" -> {
+                    System.out.println("Viewing total tickets sold...");
+                    eventTicketingController.viewTotalTicketsSold();
+                }
+                case "c" -> {
+                    System.out.println("Finding total tickets purchased by a customer...");
+                    eventTicketingController.findTotalTicketsPurchasedByCustomer();
+                }
+                case "d" -> {
+                    System.out.println("Finding total tickets sold by a vendor...");
+                    eventTicketingController.findTotalTicketsSoldByVendor();
+                }
+                case "e" -> {
+                    System.out.println("Viewing all Ticket Status...");
+                    eventTicketingController.viewAllTicketStatus();
+                }
+                case "f" -> {
+                    System.out.println("Deleting a Ticket for a Customer...");
+                    eventTicketingController.deleteTicketForCustomer();
+                }
+                case "m" -> {
+                    System.out.println("Returning to Main Menu...");
+                    return;
+                }
+                default -> System.out.println("Invalid Option. Please try again.");
             }
-            case "b" -> System.out.println("Viewing Vendor Ticket Status...");
-            case "c" -> System.out.println("Viewing Customer Ticket Status...");
-            case "d" -> System.out.println("Getting Ticket by ID...");
-            case "e" -> System.out.println("Deleting Ticket...");
-            case "m" -> System.out.println("Returning to Main Menu...");
-            default -> System.out.println("Invalid Option. Please try again.");
         }
-
     }
 
     //display customer management menu
     private static void displayCustomerManagementMenu() {
-        System.out.println("_".repeat(50));
-        System.out.println("*** Customer Management Menu ***");
-        System.out.println("_".repeat(50) + "\n");
-        System.out.println("""
-                a. View All Customers
-                b. View All Active Customers
-                c. Register New Customer
-                d. Find Customer by Name
-                e. Find Total Tickets Purchased by Customer
-                f. Deactivate Customer
-                g. Delete Customer
-                m. Back to Main Menu
-                """);
-        System.out.println("_".repeat(50));
-        System.out.println("Please select an option(Please enter M to return to the main menu): ");
+        while (true) {
+            System.out.println("_".repeat(50));
+            System.out.println("*** Customer Management Menu ***");
+            System.out.println("_".repeat(50) + "\n");
+            System.out.println("""
+                    a. View All Customers
+                    b. View All Active Customers
+                    c. Register New Customer
+                    d. Find Customer by Name
+                    e. Find total tickets purchased by a customer
+                    f. Deactivate Customer
+                    g. Reactivate Customer
+                    h. Delete Customer
+                    m. Back to Main Menu
+                    """);
+            System.out.println("_".repeat(50));
+            System.out.print("Please select an option(Please enter M to return to the main menu): ");
 
-        String option = scanner.next().toLowerCase();
+            String option = InputValidator.validateOptionAlphabetInput("abcdefgm");
 
-        switch (option) {
-            case "a" -> System.out.println("Viewing All Customers...");
-            case "b" -> System.out.println("Viewing All Active Customers...");
-            case "c" -> System.out.println("Registering New Customer...");
-            case "d" -> System.out.println("Finding Customer by Name...");
-            case "e" -> System.out.println("Finding Total Tickets Purchased by Customer...");
-            case "f" -> System.out.println("Deactivating Customer...");
-            case "g" -> System.out.println("Deleting Customer...");
-            case "m" -> System.out.println("Returning to Main Menu...");
-            default -> System.out.println("Invalid Option. Please try again.");
-
+            switch (option) {
+                case "a" -> {
+                    System.out.println("Viewing All Customers...");
+                    customerController.viewAllCustomers();
+                }
+                case "b" -> {
+                    System.out.println("Viewing All Active Customers...");
+                    customerController.viewAllActiveCustomers();
+                }
+                case "c" -> {
+                    System.out.println("Registering New Customer...");
+                    customerController.registerNewCustomer();
+                }
+                case "d" -> {
+                    System.out.println("Finding Customer by Name...");
+                    customerController.findCustomerByName();
+                }
+                case "e" -> {
+                    System.out.println("Finding total tickets purchased by a customer...");
+                    customerController.findTotalTicketsPurchasedByCustomer();
+                }
+                case "f" -> {
+                    System.out.println("Deactivating Customer...");
+                    customerController.deactivateCustomer();
+                }
+                case "g" -> {
+                    System.out.println("Reactivating Customer...");
+                    customerController.reactivateCustomer();
+                }
+                case "h" -> {
+                    System.out.println("Deleting Customer...");
+                    customerController.deleteCustomer();
+                }
+                case "m" -> {
+                    System.out.println("Returning to Main Menu...");
+                    return;
+                }
+                default -> System.out.println("Invalid Option. Please try again.");
+            }
         }
     }
 
     //display vendor management menu
     private static void displayVendorManagementMenu() {
-        System.out.println("_".repeat(50));
-        System.out.println("*** Vendor Management Menu ***");
-        System.out.println("_".repeat(50) + "\n");
-        System.out.println("""
-                a. View All Vendors
-                b. View All Active Vendors
-                c. Register New Vendor
-                d. Find Vendor by Name
-                e. Reactive Vendor
-                f. Deactivate Vendor
-                g. Delete Vendor
-                m. Back to Main Menu
-                """);
-        System.out.println("_".repeat(50));
-        System.out.println("Please select an option(Please enter M to return to the main menu): ");
-
-        String option = validateOptionAlphabetInput("abcdefgm");
-
-        switch (option) {
-            case "a" -> {
-                System.out.println("Viewing All Vendors...");
-                eventTicketingController.viewAllVendors();
-            }
-            case "b" -> {
-                System.out.println("Viewing All Active Vendors...");
-                eventTicketingController.viewAllActiveVendors();
-            }
-            case "c" -> {
-                System.out.println("Registering New Vendor...");
-                eventTicketingController.registerNewVendor();
-            }
-            case "d" -> {
-                System.out.println("Finding Vendor by Name...");
-                eventTicketingController.findVendorByName();
-            }
-            case "e" -> {
-                System.out.println("Reactivating Vendor...");
-                eventTicketingController.reactivateVendor();
-            }
-            case "f" -> {
-                System.out.println("Deactivating Vendor...");
-                eventTicketingController.deactivateVendor();
-            }
-            case "g" -> {
-                System.out.println("Deleting Vendor...");
-                eventTicketingController.deleteVendor();
-            }
-            case "m" -> System.out.println("Returning to Main Menu...");
-            default -> System.out.println("Invalid Option. Please try again.");
-
-        }
-    }
-
-    //validate option number input
-    private static int validateOptionNumberInput() {
         while (true) {
-            try {
-               return scanner.nextInt();
-            } catch (Exception e) {
-                System.out.println("Invalid input. Please enter a valid number.");
-                scanner.next();
+            System.out.println("_".repeat(50));
+            System.out.println("*** Vendor Management Menu ***");
+            System.out.println("_".repeat(50) + "\n");
+            System.out.println("""
+                    a. View All Vendors
+                    b. View All Active Vendors
+                    c. Register New Vendor
+                    d. Find Vendor by Name
+                    e. Reactive Vendor
+                    f. Deactivate Vendor
+                    g. Delete Vendor
+                    m. Back to Main Menu
+                    """);
+            System.out.println("_".repeat(50));
+            System.out.print("Please select an option(Please enter M to return to the main menu): ");
+
+            String option = InputValidator.validateOptionAlphabetInput("abcdefgm");
+
+            switch (option) {
+                case "a" -> {
+                    System.out.println("Viewing All Vendors...");
+                    vendorController.viewAllVendors();
+                }
+                case "b" -> {
+                    System.out.println("Viewing All Active Vendors...");
+                    vendorController.viewAllActiveVendors();
+                }
+                case "c" -> {
+                    System.out.println("Registering New Vendor...");
+                    vendorController.registerNewVendor();
+                }
+                case "d" -> {
+                    System.out.println("Finding Vendor by Name...");
+                    vendorController.findVendorByName();
+                }
+                case "e" -> {
+                    System.out.println("Reactivating Vendor...");
+                    vendorController.reactivateVendor();
+                }
+                case "f" -> {
+                    System.out.println("Deactivating Vendor...");
+                    vendorController.deactivateVendor();
+                }
+                case "g" -> {
+                    System.out.println("Deleting Vendor...");
+                    vendorController.deleteVendor();
+                }
+                case "m" -> {
+                    System.out.println("Returning to Main Menu...");
+                    return;
+                }
+                default -> System.out.println("Invalid Option. Please try again.");
             }
         }
     }
-
-    //validate option alphabet input
-    private static String validateOptionAlphabetInput(String options) {
-        while (true) {
-            String option = scanner.next().toLowerCase();
-            if (options.contains(option)) {
-                return option;
-            } else {
-                System.out.println("Invalid Option. Please check the menu and try again.");
-            }
-        }
-    }
-
-
 
 }

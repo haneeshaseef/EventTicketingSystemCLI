@@ -3,22 +3,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.coursework.model.*;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class EventTicketingService {
-    private static final String BASE_URL = "http://localhost:8080/api";
+    private static final String BASE_URL = "http://localhost:8080/api/ticket-pool";
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // Event Configuration Management
     public EventConfiguration checkEventConfiguration() {
         try {
-            String url = BASE_URL + "/ticket-pool/configuration";
+            String url = BASE_URL + "/configuration";
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .GET()
@@ -26,14 +27,16 @@ public class EventTicketingService {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return objectMapper.readValue(response.body(), EventConfiguration.class);
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to check event configuration: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to check event configuration: " + e.getMessage());
         }
     }
 
     public void createEventConfiguration(EventConfiguration eventConfiguration) {
         try {
-            String url = BASE_URL + "/ticket-pool/configuration";
+            String url = BASE_URL + "/configuration";
             String jsonBody = objectMapper.writeValueAsString(eventConfiguration);
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -43,16 +46,126 @@ public class EventTicketingService {
                     .build();
 
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create event configuration: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to create event configuration: " + e.getMessage());
         }
     }
 
     public void updateEventConfiguration(EventConfiguration eventConfiguration) {
         try {
-            String url = BASE_URL + "/ticket-pool";
             String jsonBody = objectMapper.writeValueAsString(eventConfiguration);
 
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL))
+                    .header("Content-Type", "application/json")
+                    .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update event configuration: " + e.getMessage());
+        }
+    }
+
+    //viewTotalTicketsAvailable
+    public int viewTotalTicketsAvailable() {
+        try {
+            String url = BASE_URL + "/status";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return Integer.parseInt(response.body());
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get total tickets available: " + e.getMessage());
+        }
+    }
+
+    //viewTotalTicketsSold by each vendor
+    public Map<String, Integer> viewTotalTicketsSold() {
+        try {
+            String url = BASE_URL + "/status";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return objectMapper.readValue(response.body(), Map.class);
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get total tickets sold: " + e.getMessage());
+        }
+    }
+
+    //findTotalTicketsPurchasedByCustomer
+    public int findTotalTicketsPurchasedByCustomer(String customerName) {
+        try {
+            String url = BASE_URL +"/"+ customerName + "/totalTicketsPurchased";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return Integer.parseInt(response.body());
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find total tickets purchased by customer: " + e.getMessage());
+        }
+    }
+
+    //findTotalTicketsSoldByVendor
+    public int findTotalTicketsSoldByVendor(String vendorName) {
+        try {
+            String url = BASE_URL +"/"+ vendorName + "/totalTicketsSold";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return Integer.parseInt(response.body());
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find total tickets sold by vendor: " + e.getMessage());
+        }
+    }
+
+    //viewAllTicketsStatus retuen list of tickets
+    public List<Ticket> viewAllTicketsStatus() {
+        try {
+            String url = BASE_URL + "/status";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return objectMapper.readValue(response.body(), List.class);
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to view all tickets status: " + e.getMessage());
+        }
+    }
+
+    //deleteTicketForCustomer
+    public void deleteTicketForCustomer(String customerName,int count) {
+        try {
+            String url = BASE_URL +"/"+ customerName + "/deleteTicket";
+            String jsonBody = objectMapper.writeValueAsString(count);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Content-Type", "application/json")
@@ -60,126 +173,10 @@ public class EventTicketingService {
                     .build();
 
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to update event configuration: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to delete ticket for customer: " + e.getMessage());
         }
     }
-
-    // Vendor Management
-    public List<Vendor> getAllVendors() {
-        try {
-            String url = BASE_URL + "/vendors";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            VendorResponse vendorResponse = objectMapper.readValue(response.body(), VendorResponse.class);
-
-            // Convert the Map values to a List
-            return new ArrayList<>(vendorResponse.getVendors().values());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get all vendors: " + e.getMessage(), e);
-        }
-    }
-
-    public List<Vendor> getActiveVendors() {
-        try {
-            String url = BASE_URL + "/vendors/active";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            VendorResponse vendorResponse = objectMapper.readValue(response.body(), VendorResponse.class);
-
-            // Convert the Map values to a List
-            return new ArrayList<>(vendorResponse.getVendors().values());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get all vendors: " + e.getMessage(), e);
-        }
-    }
-
-    public void registerNewVendor(Vendor vendor) {
-        try {
-            String url = BASE_URL + "/vendors";
-            String jsonBody = objectMapper.writeValueAsString(vendor);
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
-
-            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to register vendor: " + e.getMessage(), e);
-        }
-    }
-
-    public void deactivateVendor(String vendorName) {
-        try {
-            String url = BASE_URL + "/vendors/" + vendorName + "/deactivate";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .PUT(HttpRequest.BodyPublishers.noBody())
-                    .build();
-
-            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Vendor deactivated successfully");
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to deactivate vendor: " + e.getMessage(), e);
-        }
-    }
-
-    public Vendor findVendorByName(String vendorName) {
-        try {
-            String url = BASE_URL + "/vendors/" + vendorName;
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return objectMapper.readValue(response.body(), Vendor.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to find vendor: " + e.getMessage(), e);
-        }
-    }
-
-    public void reactivateVendor(String vendorName) {
-        try {
-            String url = BASE_URL + "/vendors/" + vendorName + "/reactivate";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .PUT(HttpRequest.BodyPublishers.noBody())
-                    .build();
-
-            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Vendor reactivated successfully");
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to reactivate vendor: " + e.getMessage(), e);
-        }
-    }
-
-    public void deleteVendor(String vendorName) {
-        try {
-            String url = BASE_URL + "/vendors/" + vendorName;
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .DELETE()
-                    .build();
-
-            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Vendor deleted successfully");
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to delete vendor: " + e.getMessage(), e);
-        }
-    }
-
-
-    // Customer Management
-
 }

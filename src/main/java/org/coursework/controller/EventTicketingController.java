@@ -3,33 +3,26 @@ package org.coursework.controller;
 import org.coursework.model.EventConfiguration;
 import org.coursework.model.Vendor;
 import org.coursework.service.EventTicketingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.coursework.utils.InputValidator;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Scanner;;
 
 public class EventTicketingController {
-
-    private static final Logger log = LoggerFactory.getLogger(EventTicketingController.class);
-    private static final DateTimeFormatter INPUT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
     private static final DateTimeFormatter DATABASE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    final EventTicketingService eventTicketingService;
-    Scanner scanner = new Scanner(System.in);
+    private final EventTicketingService eventTicketingService;
 
     public EventTicketingController(EventTicketingService eventTicketingService) {
         this.eventTicketingService = eventTicketingService;
+
     }
 
     //check Event Configuration
     public void checkEventConfiguration() {
         try {
             EventConfiguration eventConfiguration = eventTicketingService.checkEventConfiguration();
-            System.out.println("*** Event Configuration ***" +"\n");
+            System.out.println("*** Event Configuration ***" + "\n");
             System.out.printf("""
                     Event Name: %s
                     Event Date: %s
@@ -40,7 +33,7 @@ public class EventTicketingController {
                     %n""", eventConfiguration.getEventName(), eventConfiguration.getEventDate(), eventConfiguration.getTotalTickets(), eventConfiguration.getMaxCapacity(), eventConfiguration.getTicketReleaseRate(), eventConfiguration.getCustomerRetrievalRate());
             System.out.println("Event configuration checked successfully");
         } catch (Exception e) {
-            log.error("Error checking event configuration: {}", e.getMessage(), e);
+            System.out.println("Failed to check event configuration: " + e.getMessage());
         }
     }
 
@@ -49,252 +42,118 @@ public class EventTicketingController {
         try {
             // Event Name Validation
             System.out.println("Enter event name: ");
-            String eventName = validateAndGetName();
+            String eventName = InputValidator.validateTextField("Event Name");
 
             // Event Date Validation
             System.out.println("Enter event date (format: yyyy/MM/dd): "); // Updated prompt
-            LocalDateTime eventDate = validateAndGetEventDate();
+            LocalDateTime eventDate = InputValidator.validateLocalDate();
             String formattedEventDate = eventDate.format(DATABASE_DATE_FORMATTER); // Format for storage
 
             // Rest of the validation remains same
             System.out.println("Enter total tickets: ");
-            int totalTickets = validateAndGetTotalTickets();
+            int totalTickets = InputValidator.validateNumberField("Total Tickets");
 
             System.out.println("Enter max capacity: ");
-            int maxCapacity = validateAndGetMaxCapacity(totalTickets);
+            int maxCapacity = InputValidator.validateMaxCapacity(totalTickets);
 
-            System.out.println("Enter ticket release rate (tickets per minute): ");
-            int ticketReleaseRate = validateAndGetRate("ticket release");
+            System.out.println("Enter ticket release rate (tickets per release): ");
+            int ticketReleaseRate = InputValidator.validateNumberField("Ticket Release Rate");
 
-            System.out.println("Enter customer retrieval rate (customers per minute): ");
-            int customerRetrievalRate = validateAndGetRate("customer retrieval");
+            System.out.println("Enter customer retrieval rate (retrieval per release): ");
+            int customerRetrievalRate = InputValidator.validateNumberField("Customer Retrieval Rate");
 
-            EventConfiguration eventConfiguration = new EventConfiguration(
-                    eventName,
-                    formattedEventDate,
-                    totalTickets,
-                    maxCapacity,
-                    ticketReleaseRate,
-                    customerRetrievalRate
-            );
+            EventConfiguration eventConfiguration = new EventConfiguration(eventName, formattedEventDate, totalTickets, maxCapacity, ticketReleaseRate, customerRetrievalRate);
 
             System.out.println("Creating event configuration...");
             eventTicketingService.createEventConfiguration(eventConfiguration);
             System.out.println("Event configuration created successfully");
 
         } catch (Exception e) {
-            log.error("Error creating event configuration: {}", e.getMessage(), e);
             System.out.println("Failed to create event configuration: " + e.getMessage());
         }
     }
 
-
-    //Vendor Management
-    public void viewAllVendors() {
+    //view total tickets available
+    public void viewTotalTicketsAvailable() {
         try {
-            List<Vendor> vendors = eventTicketingService.getAllVendors();
-            System.out.println("*** All Vendors ***" +"\n");
-            vendors.forEach(vendor -> System.out.printf("Vendor ID: %s, Name: %s%n",
-                    vendor.getParticipantId(), vendor.getName()));
+            int totalTicketsAvailable = eventTicketingService.viewTotalTicketsAvailable();
+            System.out.println("*** Total Tickets Available ***" + "\n");
+            System.out.printf("Total Tickets Available: %d%n", totalTicketsAvailable);
+            System.out.println("Total tickets available viewed successfully");
         } catch (Exception e) {
-            log.error("Error getting all vendors: {}", e.getMessage(), e);
-        }
-    }
-    public void viewAllActiveVendors() {
-        try {
-            List<Vendor> activeVendors = eventTicketingService.getActiveVendors();
-            System.out.println("*** Active Vendors ***" +"\n");
-            activeVendors.forEach(vendor -> System.out.printf("Vendor ID: %s, Name: %s%n",
-                    vendor.getParticipantId(), vendor.getName()));
-        } catch (Exception e) {
-            log.error("Error getting active vendors: {}", e.getMessage(), e);
+            System.out.println("Failed to view total tickets available: " + e.getMessage());
         }
     }
 
-    //find vendor by name
-    public void findVendorByName() {
+    //view total tickets sold
+    public void viewTotalTicketsSold() {
         try {
-            System.out.println("Enter vendor name: ");
-            String vendorName = scanner.nextLine().trim();
-            Vendor vendor = eventTicketingService.findVendorByName(vendorName);
-            System.out.printf("Vendor ID: %s, Name: %s%n", vendor.getParticipantId(), vendor.getName());
+            List<Vendor> vendors = (List<Vendor>) eventTicketingService.viewTotalTicketsSold();
+            System.out.println("*** Total Tickets Sold ***" + "\n");
+            vendors.forEach(vendor -> {
+                System.out.printf("""
+                        Vendor ID: %s
+                        Vendor Name: %s
+                        Vendor Email: %s
+                        Tickets Per Release: %d
+                        Ticket Release Interval: %d
+                        Total Tickets to Sell: %d
+                        Vendor Status: %s
+                        %n""", vendor.getParticipantId(), vendor.getName(), vendor.getEmail(), vendor.getTicketsPerRelease(), vendor.getTicketReleaseInterval(), vendor.getTicketsToSell(), vendor.isActive() ? "Active" : "Inactive");
+            });
+            System.out.println("Total tickets sold viewed successfully");
         } catch (Exception e) {
-            log.error("Error finding vendor by name: {}", e.getMessage(), e);
-            System.out.println("Failed to find vendor by name: " + e.getMessage());
+            System.out.println("Failed to view total tickets sold: " + e.getMessage());
         }
     }
 
-    public void registerNewVendor() {
+    //findTotalTicketsPurchasedByCustomer
+    public void findTotalTicketsPurchasedByCustomer() {
         try {
-            System.out.println("Enter vendor name: ");
-            String vendorName = validateAndGetName();
-
-            System.out.println("Enter vendor email: ");
-            String vendorEmail = validateEmail();
-
-            System.out.println("Enter tickets per release: ");
-            int ticketsPerRelease = validateAndGetRate("tickets per release");
-
-            System.out.println("Enter ticket release interval (minutes): ");
-            int ticketReleaseInterval = validateAndGetRate("ticket release interval");
-
-            System.out.println("Enter total tickets to sell: ");
-            int ticketsToSell = validateAndGetTotalTickets();
-
-            Vendor vendor = new Vendor(vendorName, vendorEmail, ticketsPerRelease, ticketReleaseInterval, ticketsToSell);
-
-            System.out.println("Registering new vendor...");
-            eventTicketingService.registerNewVendor(vendor);
-            System.out.println("Vendor registered successfully");
-
+            System.out.println("Enter customer name: ");
+            String name = InputValidator.validateTextField("Customer Name");
+            int totalTicketsPurchased = eventTicketingService.findTotalTicketsPurchasedByCustomer(name);
+            System.out.printf("Total tickets purchased by %s: %d%n", name, totalTicketsPurchased);
+            System.out.println("Total tickets purchased by customer found successfully");
         } catch (Exception e) {
-            log.error("Error registering new vendor: {}", e.getMessage(), e);
-            System.out.println("Failed to register new vendor: " + e.getMessage());
+            System.out.println("Failed to find total tickets purchased by customer: " + e.getMessage());
         }
     }
 
-
-
-    //deactivate vendor
-    public void deactivateVendor() {
+    //findTotalTicketsSoldByVendor
+    public void findTotalTicketsSoldByVendor() {
         try {
             System.out.println("Enter vendor name: ");
-            String vendorName = validateAndGetName();
-            eventTicketingService.deactivateVendor(vendorName);
-            System.out.println("Vendor deactivated successfully");
+            String name = InputValidator.validateTextField("Vendor Name");
+            int totalTicketsSold = eventTicketingService.findTotalTicketsSoldByVendor(name);
+            System.out.printf("Total tickets sold by %s: %d%n", name, totalTicketsSold);
+            System.out.println("Total tickets sold by vendor found successfully");
         } catch (Exception e) {
-            log.error("Error deactivating vendor: {}", e.getMessage(), e);
-            System.out.println("Failed to deactivate vendor: " + e.getMessage());
+            System.out.println("Failed to find total tickets sold by vendor: " + e.getMessage());
         }
     }
 
-    //reactivate vendor
-    public void reactivateVendor() {
+    //view all tickets status
+    public void viewAllTicketStatus() {
         try {
-            System.out.println("Enter vendor name: ");
-            String vendorName = validateAndGetName();
-            eventTicketingService.reactivateVendor(vendorName);
-            System.out.println("Vendor reactivated successfully");
+            //TODO: Implement this method
         } catch (Exception e) {
-            log.error("Error reactivating vendor: {}", e.getMessage(), e);
-            System.out.println("Failed to reactivate vendor: " + e.getMessage());
+            System.out.println("Failed to view all tickets status: " + e.getMessage());
         }
     }
 
-    //delete vendor
-    public void deleteVendor() {
+    //delete ticket for a customer with count
+    public void deleteTicketForCustomer() {
         try {
-            System.out.println("Enter vendor name: ");
-            String vendorName = validateAndGetName();
-            eventTicketingService.deleteVendor(vendorName);
-            System.out.println("Vendor deleted successfully");
+            System.out.println("Enter customer name: ");
+            String customerName = InputValidator.validateTextField("Customer Name");
+            System.out.println("Enter number of tickets to delete: ");
+            int count = InputValidator.validateNumberField("Number of Tickets");
+            eventTicketingService.deleteTicketForCustomer(customerName, count);
+            System.out.printf("Deleted %d tickets for customer %s%n", count, customerName);
+            System.out.println("Tickets deleted successfully");
         } catch (Exception e) {
-            log.error("Error deleting vendor: {}", e.getMessage(), e);
-            System.out.println("Failed to delete vendor: " + e.getMessage());
-        }
-    }
-
-    //Customer Management
-
-    //Validation methods
-    private String validateAndGetName() {
-        while (true) {
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) {
-                System.out.println("Event name cannot be empty. Please enter a valid name: ");
-                continue;
-            }
-            if (input.length() > 100) {
-                System.out.println("Event name cannot exceed 100 characters. Please enter a valid name: ");
-                continue;
-            }
-            return input;
-        }
-    }
-
-    private LocalDateTime validateAndGetEventDate() {
-        while (true) {
-            try {
-                String input = scanner.nextLine().trim();
-                // Parse the date in yyyy/MM/dd format
-                LocalDate date = LocalDate.parse(input, INPUT_DATE_FORMATTER);
-
-                // Add default time (e.g., noon) to make it a LocalDateTime
-                LocalDateTime dateTime = date.atTime(12, 0); // Sets time to 12:00 PM
-
-                // Validate that the date is in the future
-                if (dateTime.isBefore(LocalDateTime.now())) {
-                    System.out.println("Event date must be in the future. Please enter a valid date (format: yyyy/MM/dd): ");
-                    continue;
-                }
-
-                return dateTime;
-            } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Please enter date in format yyyy/MM/dd (e.g., 2024/12/31): ");
-            }
-        }
-    }
-
-
-    private int validateAndGetTotalTickets() {
-        while (true) {
-            try {
-                int totalTickets = Integer.parseInt(scanner.nextLine().trim());
-                if (totalTickets <= 0) {
-                    System.out.println("Total tickets must be greater than 0. Please enter a valid number: ");
-                    continue;
-                }
-                return totalTickets;
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid number format for total tickets. Please enter a valid number: ");
-            }
-        }
-    }
-
-    private int validateAndGetMaxCapacity(int totalTickets) {
-       while (true) {
-           try {
-               int maxCapacity = Integer.parseInt(scanner.nextLine().trim());
-               if (maxCapacity <= 0) {
-                   System.out.println("Max capacity must be greater than 0. Please enter a valid number: ");
-                   continue;
-               }
-               if (maxCapacity < totalTickets) {
-                   System.out.println("Max capacity cannot be less than total tickets. Please enter a valid number: ");
-                   continue;
-               }
-               return maxCapacity;
-           } catch (NumberFormatException e) {
-               System.out.println("Invalid number format for max capacity. Please enter a valid number: ");
-           }
-       }
-    }
-
-    private int validateAndGetRate(String rateType) {
-        while (true) {
-            try {
-                int rate = Integer.parseInt(scanner.nextLine().trim());
-                if (rate <= 0) {
-                    System.out.printf("%s rate must be greater than 0. Please enter a valid number: ", rateType);
-                    continue;
-                }
-                return rate;
-            } catch (NumberFormatException e) {
-                System.out.printf("Invalid number format for %s rate. Please enter a valid number: ", rateType);
-            }
-        }
-    }
-
-    private String validateEmail() {
-        //Regex pattern for email validation
-        String emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
-        while (true) {
-            String email = scanner.nextLine().trim();
-            if (!email.matches(emailPattern)) {
-                System.out.println("Invalid email format. Please enter a valid email: ");
-                continue;
-            }
-            return email;
+            System.out.println("Failed to delete ticket for customer: " + e.getMessage());
         }
     }
 }

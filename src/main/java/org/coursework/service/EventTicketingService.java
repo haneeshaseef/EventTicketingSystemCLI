@@ -1,7 +1,9 @@
 package org.coursework.service;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.coursework.model.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.coursework.model.EventConfiguration;
+import org.coursework.model.Ticket;
 
 import java.net.ConnectException;
 import java.net.URI;
@@ -9,7 +11,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Map;
 
 public class EventTicketingService {
     private static final String BASE_URL = "http://localhost:8080/api/ticket-pool";
@@ -20,10 +21,7 @@ public class EventTicketingService {
     public EventConfiguration checkEventConfiguration() {
         try {
             String url = BASE_URL + "/configuration";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return objectMapper.readValue(response.body(), EventConfiguration.class);
@@ -39,11 +37,7 @@ public class EventTicketingService {
             String url = BASE_URL + "/configuration";
             String jsonBody = objectMapper.writeValueAsString(eventConfiguration);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(jsonBody)).build();
 
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (ConnectException e) {
@@ -57,11 +51,7 @@ public class EventTicketingService {
         try {
             String jsonBody = objectMapper.writeValueAsString(eventConfiguration);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL))
-                    .header("Content-Type", "application/json")
-                    .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL)).header("Content-Type", "application/json").PUT(HttpRequest.BodyPublishers.ofString(jsonBody)).build();
 
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (ConnectException e) {
@@ -74,11 +64,8 @@ public class EventTicketingService {
     //viewTotalTicketsAvailable
     public int viewTotalTicketsAvailable() {
         try {
-            String url = BASE_URL + "/status";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
+            String url = BASE_URL + "/availableTickets";
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Integer.parseInt(response.body());
@@ -89,32 +76,11 @@ public class EventTicketingService {
         }
     }
 
-    //viewTotalTicketsSold by each vendor
-    public Map<String, Integer> viewTotalTicketsSold() {
-        try {
-            String url = BASE_URL + "/status";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return objectMapper.readValue(response.body(), Map.class);
-        } catch (ConnectException e) {
-            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get total tickets sold: " + e.getMessage());
-        }
-    }
-
     //findTotalTicketsPurchasedByCustomer
     public int findTotalTicketsPurchasedByCustomer(String customerName) {
         try {
-            String url = BASE_URL +"/"+ customerName + "/totalTicketsPurchased";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
+            String url = BASE_URL + "/" + customerName + "/totalTicketsPurchased";
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Integer.parseInt(response.body());
@@ -128,11 +94,8 @@ public class EventTicketingService {
     //findTotalTicketsSoldByVendor
     public int findTotalTicketsSoldByVendor(String vendorName) {
         try {
-            String url = BASE_URL +"/"+ vendorName + "/totalTicketsSold";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
+            String url = BASE_URL + "/" + vendorName + "/totalTicketsSold";
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Integer.parseInt(response.body());
@@ -143,40 +106,46 @@ public class EventTicketingService {
         }
     }
 
-    //viewAllTicketsStatus retuen list of tickets
-    public List<Ticket> viewAllTicketsStatus() {
+    //view all tickets
+    public List<Ticket> viewAllTickets() {
         try {
-            String url = BASE_URL + "/status";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
+            String url = BASE_URL + "/tickets";
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return objectMapper.readValue(response.body(), List.class);
-        } catch (ConnectException e) {
-            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
+
+            return objectMapper.readValue(response.body(), new TypeReference<List<Ticket>>() {
+            });
         } catch (Exception e) {
-            throw new RuntimeException("Failed to view all tickets status: " + e.getMessage());
+            throw new RuntimeException("Failed to view all tickets: " + e.getMessage());
         }
     }
 
     //deleteTicketForCustomer
-    public void deleteTicketForCustomer(String customerName,int count) {
+    public void deleteTicketForCustomer(String customerName) {
         try {
-            String url = BASE_URL +"/"+ customerName + "/deleteTicket";
-            String jsonBody = objectMapper.writeValueAsString(count);
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Content-Type", "application/json")
-                    .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .build();
+            String url = BASE_URL + "/" + customerName + "/deleteTicket";
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).DELETE().build();
 
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (ConnectException e) {
             throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete ticket for customer: " + e.getMessage());
+        }
+    }
+
+    //deleteTicket
+    public void deleteTicket(String ticketId) {
+        try {
+            String url = BASE_URL + "/" + ticketId;
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).DELETE().build();
+
+            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException e) {
+            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete ticket: " + e.getMessage());
         }
     }
 }

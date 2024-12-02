@@ -3,6 +3,8 @@ package org.coursework.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.coursework.model.Customer;
 import org.coursework.model.CustomerResponse;
+import org.coursework.model.Ticket;
+import org.coursework.model.TicketsResponse;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -21,7 +23,7 @@ public class CustomerService {
     public List<Customer> viewAllCustomers() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL))
+                    .uri(URI.create(BASE_URL+"/all"))
                     .GET()
                     .build();
 
@@ -89,16 +91,19 @@ public class CustomerService {
     }
 
     //find total tickets purchased by a customer
-    public int findTotalTicketsPurchasedByCustomer(String customerName) {
+    public List<Ticket> findAllPurchasedTicketsByCustomer(String customerName) {
         try {
-            String url = BASE_URL +"/"+ customerName + "/totalTicketsPurchased";
+            String url = BASE_URL +"/"+ customerName + "/tickets";
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .GET()
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return Integer.parseInt(response.body());
+            TicketsResponse ticketsResponse = objectMapper.readValue(response.body(), TicketsResponse.class);
+
+            // Ticktesponse is list of ticets
+            return ticketsResponse.getTickets();
         } catch (Exception e) {
             throw new RuntimeException("Failed to find total tickets purchased by customer: " + e.getMessage());
         }
@@ -137,7 +142,7 @@ public class CustomerService {
     //find a customer by name
     public Customer findCustomerByName(String customerName) {
         try {
-            String url = BASE_URL +"/"+ customerName;
+            String url = BASE_URL +"/name/"+ customerName;
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .GET()

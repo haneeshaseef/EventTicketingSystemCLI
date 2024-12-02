@@ -68,6 +68,22 @@ public class VendorService {
         }
     }
 
+    public void updateVendor(Vendor vendor) {
+        try {
+            String jsonBody = objectMapper.writeValueAsString(vendor);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL))
+                    .header("Content-Type", "application/json")
+                    .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update vendor: " + e.getMessage());
+        }
+    }
+
     public void deactivateVendor(String vendorName) {
         try {
             String url = BASE_URL +"/"+ vendorName + "/deactivate";

@@ -9,7 +9,7 @@ import org.coursework.service.VendorService;
 import org.coursework.utils.InputValidator;
 
 public class EventTicketingSystemCLI {
-    private static final EventTicketingController eventTicketingController = new EventTicketingController(new EventTicketingService());
+    private static final EventTicketingController eventTicketingController = new EventTicketingController(new EventTicketingService(), new CustomerService());
     private static final VendorController vendorController = new VendorController(new VendorService());
     private static final CustomerController customerController = new CustomerController(new CustomerService());
 
@@ -104,40 +104,35 @@ public class EventTicketingSystemCLI {
             System.out.println("_".repeat(50) + "\n");
             System.out.println("""
                     a. View total tickets available
-                    b. View total tickets sold
-                    c. find total tickets purchased by a customer
-                    d. find total tickets sold by a vendor
-                    e. View all Ticket Status
-                    f. Delete a Ticket for a Customer
+                    b. find total tickets purchased by a customer
+                    c. find total tickets sold by a vendor
+                    d. View all Ticket Status
+                    e. Delete a Ticket for a Customer
                     m. Back to Main Menu
                     """);
             System.out.println("_".repeat(50));
             System.out.print("Please select an option(Please enter M to return to the main menu): ");
 
-            String option = InputValidator.validateOptionAlphabetInput("abcdefgm");
+            String option = InputValidator.validateOptionAlphabetInput("abcdem");
 
             switch (option) {
                 case "a" -> {
-                    System.out.println("Viewing total tickets available...");
+                    System.out.println("Viewing Total Tickets Available...");
                     eventTicketingController.viewTotalTicketsAvailable();
                 }
                 case "b" -> {
-                    System.out.println("Viewing total tickets sold...");
-                    eventTicketingController.viewTotalTicketsSold();
-                }
-                case "c" -> {
                     System.out.println("Finding total tickets purchased by a customer...");
                     eventTicketingController.findTotalTicketsPurchasedByCustomer();
                 }
-                case "d" -> {
+                case "c" -> {
                     System.out.println("Finding total tickets sold by a vendor...");
                     eventTicketingController.findTotalTicketsSoldByVendor();
                 }
-                case "e" -> {
-                    System.out.println("Viewing all Ticket Status...");
-                    eventTicketingController.viewAllTicketStatus();
+                case "d" -> {
+                    System.out.println("Viewing All Ticket Status...");
+                    eventTicketingController.viewAllTickets();
                 }
-                case "f" -> {
+                case "e" -> {
                     System.out.println("Deleting a Ticket for a Customer...");
                     eventTicketingController.deleteTicketForCustomer();
                 }
@@ -164,13 +159,14 @@ public class EventTicketingSystemCLI {
                     e. Find total tickets purchased by a customer
                     f. Deactivate Customer
                     g. Reactivate Customer
-                    h. Delete Customer
+                    h. Update Customer
+                    I. Delete Customer
                     m. Back to Main Menu
                     """);
             System.out.println("_".repeat(50));
             System.out.print("Please select an option(Please enter M to return to the main menu): ");
 
-            String option = InputValidator.validateOptionAlphabetInput("abcdefgm");
+            String option = InputValidator.validateOptionAlphabetInput("abcdefghim");
 
             switch (option) {
                 case "a" -> {
@@ -191,7 +187,7 @@ public class EventTicketingSystemCLI {
                 }
                 case "e" -> {
                     System.out.println("Finding total tickets purchased by a customer...");
-                    customerController.findTotalTicketsPurchasedByCustomer();
+                    eventTicketingController.findTotalTicketsPurchasedByCustomer();
                 }
                 case "f" -> {
                     System.out.println("Deactivating Customer...");
@@ -202,6 +198,10 @@ public class EventTicketingSystemCLI {
                     customerController.reactivateCustomer();
                 }
                 case "h" -> {
+                    System.out.println("Updating Customer...");
+                    customerController.updateCustomer();
+                }
+                case "i" -> {
                     System.out.println("Deleting Customer...");
                     customerController.deleteCustomer();
                 }
@@ -225,15 +225,17 @@ public class EventTicketingSystemCLI {
                     b. View All Active Vendors
                     c. Register New Vendor
                     d. Find Vendor by Name
-                    e. Reactive Vendor
-                    f. Deactivate Vendor
-                    g. Delete Vendor
+                    e. Find total tickets sold by a vendor
+                    f. Reactive Vendor
+                    g. Deactivate Vendor
+                    h. Update Vendor
+                    i. Delete Vendor
                     m. Back to Main Menu
                     """);
             System.out.println("_".repeat(50));
             System.out.print("Please select an option(Please enter M to return to the main menu): ");
 
-            String option = InputValidator.validateOptionAlphabetInput("abcdefgm");
+            String option = InputValidator.validateOptionAlphabetInput("abcdefghm");
 
             switch (option) {
                 case "a" -> {
@@ -253,14 +255,22 @@ public class EventTicketingSystemCLI {
                     vendorController.findVendorByName();
                 }
                 case "e" -> {
+                    System.out.println("Finding total tickets sold by a vendor...");
+                    eventTicketingController.findTotalTicketsSoldByVendor();
+                }
+                case "f" -> {
                     System.out.println("Reactivating Vendor...");
                     vendorController.reactivateVendor();
                 }
-                case "f" -> {
+                case "g" -> {
                     System.out.println("Deactivating Vendor...");
                     vendorController.deactivateVendor();
                 }
-                case "g" -> {
+                case "h" -> {
+                    System.out.println("Updating Vendor...");
+                    vendorController.updateVendor();
+                }
+                case "i" -> {
                     System.out.println("Deleting Vendor...");
                     vendorController.deleteVendor();
                 }

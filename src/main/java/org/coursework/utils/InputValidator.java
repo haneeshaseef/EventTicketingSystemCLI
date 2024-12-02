@@ -35,15 +35,30 @@ public abstract class InputValidator {
 
     //Validate String input
     public static String validateTextField(String fieldName) {
-        //String regex pattern for name validation
-        String namePattern = "^[A-Za-z]{2,25}\\\\s[A-Za-z]{2,25}$";
+        // Updated regex to be more lenient
+        String namePattern = "^[A-Za-z]{2,25}(?:\\s[A-Za-z]{2,25})?$";
+
         while (true) {
             System.out.println("Enter " + fieldName + ": ");
-            String name = scanner.nextLine().trim();
-            if (!name.matches(namePattern)) {
-                System.out.printf("Invalid %s. Please enter a valid %s: ", fieldName, fieldName);
+
+            // Use nextLine() to capture the entire line of input
+            String userInput = scanner.next();
+            scanner.nextLine(); // Consume the newline character
+
+            // Trim the input
+            String name = userInput.trim();
+
+            // Check if input is empty AFTER trimming
+            if (name.isEmpty()) {
+                System.out.println("Input cannot be empty. Please try again.");
                 continue;
             }
+
+            if (!name.matches(namePattern)) {
+                System.out.println("Invalid format. Use 2-25 letters, optional second word.");
+                continue;
+            }
+
             return name;
         }
     }

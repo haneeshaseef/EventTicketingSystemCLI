@@ -12,8 +12,8 @@ public class Vendor {
     @JsonProperty("email")
     private String email;
 
-    @JsonProperty("ticketsPerRelease")  // Changed from ticketPerRelease to match API
-    private int ticketsPerRelease;      // Changed variable name to match as well
+    @JsonProperty("ticketsPerRelease")
+    private int ticketsPerRelease;
 
     @JsonProperty("ticketReleaseInterval")
     private long ticketReleaseInterval;

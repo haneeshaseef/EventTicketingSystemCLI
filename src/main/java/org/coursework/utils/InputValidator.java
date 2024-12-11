@@ -35,7 +35,7 @@ public abstract class InputValidator {
 
     //Validate String input
     public static String validateTextField(String fieldName) {
-        // Updated regex to be more lenient
+        //Ref: https://stackoverflow.com/questions/4067809/how-to-allow-only-letters-in-a-string-using-java
         String namePattern = "^[A-Za-z]{2,25}(?:\\s[A-Za-z]{2,25})?$";
 
         while (true) {
@@ -81,7 +81,7 @@ public abstract class InputValidator {
 
     //validate email
     public static String validateEmail() {
-        //Regex pattern for email validation
+        //Ref: https://www.geeksforgeeks.org/check-email-address-valid-not-java/
         String emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
         while (true) {
             String email = scanner.nextLine().trim();
@@ -115,7 +115,7 @@ public abstract class InputValidator {
     }
 
     //validate max capacity
-    public static int validateMaxCapacity(int totalTickets) {
+    public static int validateMaxCapacity() {
         while (true) {
             try {
                 int maxCapacity = Integer.parseInt(scanner.nextLine().trim());
@@ -123,14 +123,37 @@ public abstract class InputValidator {
                     System.out.println("Max capacity must be greater than 0. Please enter a valid number: ");
                     continue;
                 }
-                if (maxCapacity < totalTickets) {
-                    System.out.println("Max capacity cannot be less than total tickets. Please enter a valid number: ");
-                    continue;
-                }
                 return maxCapacity;
             } catch (NumberFormatException e) {
                 System.out.println("Invalid number format for max capacity. Please enter a valid number: ");
             }
+        }
+    }
+
+    // validate password
+    public static String validatePassword() {
+        //Ref: https://www.geeksforgeeks.org/how-to-validate-a-password-using-regular-expressions-in-java/
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+        while (true) {
+            String password = scanner.nextLine().trim();
+            if (!password.matches(passwordPattern)) {
+                System.out.println("Invalid password format. Please enter a valid password: ");
+                continue;
+            }
+            return password;
+        }
+    }
+
+    public static String validateMongoDBId() {
+        //Ref: https://docs.mongodb.com/manual/reference/method/ObjectId/
+        String idPattern = "^[0-9a-fA-F]{24}$";
+        while (true) {
+            String id = scanner.nextLine().trim();
+            if (!id.matches(idPattern)) {
+                System.out.println("Invalid ID format. Please enter a valid ID: ");
+                continue;
+            }
+            return id;
         }
     }
 

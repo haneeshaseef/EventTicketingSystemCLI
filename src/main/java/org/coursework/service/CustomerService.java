@@ -90,25 +90,6 @@ public class CustomerService {
         }
     }
 
-    //find total tickets purchased by a customer
-    public List<Ticket> findAllPurchasedTicketsByCustomer(String customerName) {
-        try {
-            String url = BASE_URL +"/"+ customerName + "/tickets";
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            TicketsResponse ticketsResponse = objectMapper.readValue(response.body(), TicketsResponse.class);
-
-            // Ticktesponse is list of ticets
-            return ticketsResponse.getTickets();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to find total tickets purchased by customer: " + e.getMessage());
-        }
-    }
-
     //deactivate a customer
     public void deactivateCustomer(String customerName) {
         try {

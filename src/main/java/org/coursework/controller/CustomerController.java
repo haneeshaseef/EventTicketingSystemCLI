@@ -46,21 +46,22 @@ public class CustomerController {
             String name = InputValidator.validateTextField("Customer Name");
             System.out.println("Enter customer email: ");
             String email = InputValidator.validateEmail();
+            System.out.println("Enter customer password: ");
+            String password = InputValidator.validatePassword();
             System.out.println("Enter the tickets to purchase: ");
             int ticketToPurchase = InputValidator.validateNumberField("Tickets to Purchase");
             System.out.println("Enter the ticket Retrieval Interval(in seconds): ");
             int totalTicketsPerRetrieval = InputValidator.validateNumberField("Ticket Retrieval Interval");
-            Customer customer = new Customer(name, email, ticketToPurchase, totalTicketsPerRetrieval);
+            Customer customer = new Customer(name, email, password,ticketToPurchase, totalTicketsPerRetrieval);
             customerService.registerNewCustomer(customer);
             System.out.println("New customer registered successfully");
             System.out.println("*** Customer Details ***" + "\n");
             System.out.printf("""
-                    Customer ID: %s
                     Customer Name: %s
                     Customer Email: %s
                     Tickets to Purchase: %d
                     Ticket Retrieval Interval: %d
-                    %n""", customer.getParticipantId(), customer.getName(), customer.getEmail(), customer.getTicketsToPurchase(), customer.getTicketRetrievalInterval());
+                    %n""", customer.getName(), customer.getEmail(), customer.getTicketsToPurchase(), customer.getTicketRetrievalInterval());
             System.out.println("-".repeat(50));
         } catch (Exception e) {
             System.out.println("Failed to register new customer: " + e.getMessage());
@@ -128,7 +129,6 @@ public class CustomerController {
     //deactivate a customer
     public void deactivateCustomer() {
         try {
-            System.out.println("Enter customer name to deactivate: ");
             String name = InputValidator.validateTextField("Customer Name");
             Customer customer = customerService.findCustomerByName(name);
             customerService.deactivateCustomer(name);
@@ -152,7 +152,6 @@ public class CustomerController {
     //reactivate a customer
     public void reactivateCustomer() {
         try {
-            System.out.println("Enter customer name to reactivate: ");
             String name = InputValidator.validateTextField("Customer Name");
             Customer customer = customerService.findCustomerByName(name);
             customerService.reactivateCustomer(name);
@@ -201,21 +200,9 @@ public class CustomerController {
     //delete a customer
     public void deleteCustomer() {
         try {
-            System.out.println("Enter customer name to delete: ");
-            String name = InputValidator.validateTextField("Customer Name");
-            Customer customer = customerService.findCustomerByName(name);
-            customerService.deleteCustomer(name);
-            System.out.println("Customer deleted successfully");
-            System.out.println("*** Customer Deleted ***" + "\n");
-            System.out.println("*** Customer Details ***" + "\n");
-            System.out.printf("""
-                    Customer ID: %s
-                    Customer Name: %s
-                    Customer Email: %s
-                    Tickets to Purchase: %d
-                    Ticket Retrieval Interval: %d
-                    Customer Status: %s
-                    %n""", customer.getParticipantId(), customer.getName(), customer.getEmail(), customer.getTicketsToPurchase(), customer.getTicketRetrievalInterval(), customer.isActive() ? "Active" : "Inactive");
+            String customerName = InputValidator.validateTextField("Customer Name");
+           customerService.deleteCustomer(customerName);
+            System.out.printf("Customer %s deleted successfully%n", customerName);
             System.out.println("-".repeat(50));
         } catch (Exception e) {
             System.out.println("Failed to delete customer: " + e.getMessage());

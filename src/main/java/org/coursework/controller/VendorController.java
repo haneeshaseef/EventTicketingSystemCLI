@@ -36,7 +36,6 @@ public class VendorController {
     //find vendor by name
     public void findVendorByName() {
         try {
-            System.out.println("Enter vendor name: ");
             String vendorName = InputValidator.validateTextField("Vendor Name");
             Vendor vendor = vendorService.findVendorByName(vendorName);
             System.out.println("*** Vendor Found ***" + "\n");
@@ -59,6 +58,10 @@ public class VendorController {
             String vendorName = InputValidator.validateTextField("Vendor Name");
             System.out.println("Enter vendor email: ");
             String vendorEmail = InputValidator.validateEmail();
+
+            System.out.println("Enter vendor password: ");
+            String vendorPassword = InputValidator.validatePassword();
+
             System.out.println("Enter tickets per release: ");
             int ticketsPerRelease = InputValidator.validateNumberField("Tickets Per Release");
 
@@ -68,7 +71,7 @@ public class VendorController {
             System.out.println("Enter total tickets to sell: ");
             int ticketsToSell = InputValidator.validateNumberField("Total Tickets to Sell");
 
-            Vendor vendor = new Vendor(vendorName, vendorEmail, ticketsPerRelease, ticketReleaseInterval, ticketsToSell);
+            Vendor vendor = new Vendor(vendorName, vendorEmail, vendorPassword ,ticketsPerRelease, ticketReleaseInterval, ticketsToSell);
 
             System.out.println("Registering new vendor...");
             vendorService.registerNewVendor(vendor);
@@ -76,14 +79,12 @@ public class VendorController {
             System.out.println("*** Vendor Registered ***" + "\n");
             System.out.println("*** Vendor Details ***" + "\n");
             System.out.printf("""
-                    Vendor ID: %s
                     Vendor Name: %s
                     Vendor Email: %s
                     Tickets Per Release: %d
                     Ticket Release Interval: %d
                     Total Tickets to Sell: %d
-                    Vendor Status: %s
-                    %n""", vendor.getParticipantId(), vendor.getName(), vendor.getEmail(), vendor.getTicketsPerRelease(), vendor.getTicketReleaseInterval(), vendor.getTicketsToSell(), vendor.isActive() ? "Active" : "Inactive");
+                    %n""", vendor.getName(), vendor.getEmail(), vendor.getTicketsPerRelease(), vendor.getTicketReleaseInterval(), vendor.getTicketsToSell());
         } catch (Exception e) {
             System.out.println("Failed to register new vendor: " + e.getMessage());
         }
@@ -92,7 +93,6 @@ public class VendorController {
     //update vendor
     public void updateVendor() {
         try {
-            System.out.println("Enter vendor name to update: ");
             String name = InputValidator.validateTextField("Vendor Name");
             Vendor vendor = vendorService.findVendorByName(name);
 
@@ -155,7 +155,6 @@ public class VendorController {
     //deactivate vendor
     public void deactivateVendor() {
         try {
-            System.out.println("Enter vendor name: ");
             String vendorName = InputValidator.validateTextField("Vendor Name");
             Vendor vendor = vendorService.findVendorByName(vendorName);
             vendorService.deactivateVendor(vendorName);
@@ -177,7 +176,6 @@ public class VendorController {
     //reactivate vendor
     public void reactivateVendor() {
         try {
-            System.out.println("Enter vendor name: ");
             String vendorName = InputValidator.validateTextField("Vendor Name");
             Vendor vendor = vendorService.findVendorByName(vendorName);
             vendorService.reactivateVendor(vendorName);
@@ -199,10 +197,9 @@ public class VendorController {
     //delete vendor
     public void deleteVendor() {
         try {
-            System.out.println("Enter vendor name: ");
             String vendorName = InputValidator.validateTextField("Vendor Name");
             vendorService.deleteVendor(vendorName);
-            System.out.println("Vendor deleted successfully");
+            System.out.printf("Vendor %s deleted successfully%n", vendorName);
         } catch (Exception e) {
             System.out.println("Failed to delete vendor: " + e.getMessage());
         }

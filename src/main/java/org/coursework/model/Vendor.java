@@ -3,6 +3,7 @@ package org.coursework.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Vendor {
+
     @JsonProperty("participantId")
     private String participantId;
 
@@ -11,6 +12,9 @@ public class Vendor {
 
     @JsonProperty("email")
     private String email;
+
+    @JsonProperty("password")
+    private String password;
 
     @JsonProperty("ticketsPerRelease")
     private int ticketsPerRelease;
@@ -30,12 +34,15 @@ public class Vendor {
     @JsonProperty("active")
     private boolean active;
 
+    // Default constructor
     public Vendor() {
     }
 
-    public Vendor(String vendorName, String vendorEmail, int ticketsPerRelease, int ticketReleaseInterval, int ticketsToSell) {
+    // Parameterized constructor
+    public Vendor(String vendorName, String vendorEmail, String password, int ticketsPerRelease, long ticketReleaseInterval, int ticketsToSell) {
         this.name = vendorName;
         this.email = vendorEmail;
+        this.password = password;
         this.ticketsPerRelease = ticketsPerRelease;
         this.ticketReleaseInterval = ticketReleaseInterval;
         this.ticketsToSell = ticketsToSell;
@@ -44,8 +51,13 @@ public class Vendor {
         this.active = false;
     }
 
+    // Getters and setters
     public String getParticipantId() {
         return participantId;
+    }
+
+    public void setParticipantId(String participantId) {
+        this.participantId = participantId;
     }
 
     public String getName() {
@@ -64,11 +76,19 @@ public class Vendor {
         this.email = email;
     }
 
-    public int getTicketsPerRelease() {  // Changed from getTicketPerRelease
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getTicketsPerRelease() {
         return ticketsPerRelease;
     }
 
-    public void setTicketsPerRelease(int ticketsPerRelease) {  // Changed from setTicketPerRelease
+    public void setTicketsPerRelease(int ticketsPerRelease) {
         this.ticketsPerRelease = ticketsPerRelease;
     }
 

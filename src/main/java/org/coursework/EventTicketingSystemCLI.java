@@ -79,14 +79,19 @@ public class EventTicketingSystemCLI {
                 case "a" -> {
                     System.out.println("Checking Event Configuration...");
                     eventTicketingController.checkEventConfiguration();
-
                 }
                 case "b" -> {
                     System.out.println("Creating Event Configuration...");
                     eventTicketingController.createEventConfiguration();
                 }
-                case "c" -> System.out.println("Updating Event Configuration...");
-                case "d" -> System.out.println("Viewing Ticket Pool Status...");
+                case "c" -> {
+                    System.out.println("Updating Event Configuration...");
+                    eventTicketingController.updateEventConfiguration();
+                }
+                case "d" -> {
+                    System.out.println("Viewing Ticket Pool Status...");
+                    eventTicketingController.viewTicketPoolStatus();
+                }
                 case "m" -> {
                     System.out.println("Returning to Main Menu...");
                     return;
@@ -160,7 +165,7 @@ public class EventTicketingSystemCLI {
                     f. Deactivate Customer
                     g. Reactivate Customer
                     h. Update Customer
-                    I. Delete Customer
+                    i. Delete Customer
                     m. Back to Main Menu
                     """);
             System.out.println("_".repeat(50));
@@ -235,7 +240,7 @@ public class EventTicketingSystemCLI {
             System.out.println("_".repeat(50));
             System.out.print("Please select an option(Please enter M to return to the main menu): ");
 
-            String option = InputValidator.validateOptionAlphabetInput("abcdefghm");
+            String option = InputValidator.validateOptionAlphabetInput("abcdefghim");
 
             switch (option) {
                 case "a" -> {

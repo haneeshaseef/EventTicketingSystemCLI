@@ -24,10 +24,10 @@ public class EventConfiguration {
     public EventConfiguration() {
     }
 
-    public EventConfiguration(String eventName, String eventDate, int totalTickets, int maxCapacity, int ticketReleaseRate, int customerRetrievalRate) {
+    public EventConfiguration(String eventName, String eventDate, int maxCapacity, int ticketReleaseRate, int customerRetrievalRate) {
         this.eventName = eventName;
         this.eventDate = eventDate;
-        this.totalTickets = totalTickets;
+        this.totalTickets = 0;
         this.maxCapacity = maxCapacity;
         this.ticketReleaseRate = ticketReleaseRate;
         this.customerRetrievalRate = customerRetrievalRate;

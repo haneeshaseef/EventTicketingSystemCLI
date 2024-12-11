@@ -12,6 +12,9 @@ public class Customer {
     @JsonProperty("email")
     private String email;
 
+    @JsonProperty("password")
+    private String password;
+
     @JsonProperty("ticketsToPurchase")
     private int ticketsToPurchase;
 
@@ -27,9 +30,10 @@ public class Customer {
     public Customer() {
     }
 
-    public Customer(String customerName, String customerEmail, int ticketsToPurchase, int ticketRetrievalInterval) {
-        this.name = customerName;
-        this.email = customerEmail;
+    public Customer(String name, String email, String password, int ticketsToPurchase, long ticketRetrievalInterval) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
         this.ticketsToPurchase = ticketsToPurchase;
         this.ticketRetrievalInterval = ticketRetrievalInterval;
         this.totalTicketsPurchased = 0;
@@ -58,6 +62,14 @@ public class Customer {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public int getTicketsToPurchase() {

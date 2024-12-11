@@ -144,6 +144,7 @@ public abstract class InputValidator {
         }
     }
 
+    //validate MongoDB ID
     public static String validateMongoDBId() {
         //Ref: https://docs.mongodb.com/manual/reference/method/ObjectId/
         String idPattern = "^[0-9a-fA-F]{24}$";
@@ -157,6 +158,7 @@ public abstract class InputValidator {
         }
     }
 
+    //close scanner
     public static void closeScanner() {
         scanner.close();
     }

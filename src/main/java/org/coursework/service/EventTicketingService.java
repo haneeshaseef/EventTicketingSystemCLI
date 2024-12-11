@@ -128,20 +128,6 @@ public class EventTicketingService {
         }
     }
 
-    //deleteTicketForCustomer
-    public void deleteTicketForCustomer(String customerName) {
-        try {
-            String url = BASE_URL + "/" + customerName + "/deleteTicket";
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).DELETE().build();
-
-            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (ConnectException e) {
-            throw new RuntimeException("Failed to connect to the server: " + e.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to delete ticket for customer: " + e.getMessage());
-        }
-    }
-
     //deleteTicket
     public void deleteTicket(String ticketId) {
         try {

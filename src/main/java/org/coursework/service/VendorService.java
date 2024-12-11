@@ -17,6 +17,7 @@ public class VendorService {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    // View all vendors
     public List<Vendor> getAllVendors() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -34,6 +35,7 @@ public class VendorService {
         }
     }
 
+    // View all active vendors
     public List<Vendor> getActiveVendors() {
         try {
             String url = BASE_URL + "/active";
@@ -52,6 +54,7 @@ public class VendorService {
         }
     }
 
+    // Register a new vendor
     public void registerNewVendor(Vendor vendor) {
         try {
             String jsonBody = objectMapper.writeValueAsString(vendor);
@@ -68,6 +71,7 @@ public class VendorService {
         }
     }
 
+    // Update a vendor
     public void updateVendor(Vendor vendor) {
         try {
             String jsonBody = objectMapper.writeValueAsString(vendor);
@@ -84,6 +88,7 @@ public class VendorService {
         }
     }
 
+    // Deactivate a vendor
     public void deactivateVendor(String vendorName) {
         try {
             String url = BASE_URL +"/"+ vendorName + "/deactivate";
@@ -99,6 +104,7 @@ public class VendorService {
         }
     }
 
+    // Find a vendor by name
     public Vendor findVendorByName(String vendorName) {
         try {
             String url = BASE_URL + "/name/" + vendorName;
@@ -114,6 +120,7 @@ public class VendorService {
         }
     }
 
+    // Reactivate a vendor
     public void reactivateVendor(String vendorName) {
         try {
             String url = BASE_URL + "/" + vendorName + "/reactivate";
@@ -129,6 +136,7 @@ public class VendorService {
         }
     }
 
+    // Delete a vendor
     public void deleteVendor(String vendorName) {
         try {
             String url = BASE_URL + "/" + vendorName;

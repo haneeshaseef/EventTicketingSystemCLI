@@ -25,7 +25,8 @@ public class Ticket {
     @JsonDeserialize(converter = LocalDateTimeConverter.class)
     private LocalDateTime purchasedAt;
 
-    // Custom converter to handle the array-based date format
+    //Ref: https://www.baeldung.com/jackson-custom-serialization
+    // Custom deserializer for LocalDateTime
     public static class LocalDateTimeConverter extends StdConverter<List<Integer>, LocalDateTime> {
         @Override
         public LocalDateTime convert(List<Integer> value) {
@@ -44,11 +45,9 @@ public class Ticket {
         }
     }
 
-    // Default constructor
     public Ticket() {
     }
 
-    // Parameterized constructor
     public Ticket(String ticketId, Vendor vendor, Customer customer, LocalDateTime createdAt, LocalDateTime purchasedAt) {
         this.ticketId = ticketId;
         this.vendor = vendor;
@@ -57,7 +56,6 @@ public class Ticket {
         this.purchasedAt = purchasedAt;
     }
 
-    // Getters and setters (unchanged)
     public String getTicketId() {
         return ticketId;
     }

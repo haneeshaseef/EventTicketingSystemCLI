@@ -14,11 +14,9 @@ import java.util.List;
 public class EventTicketingController {
     private static final DateTimeFormatter DATABASE_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventTicketingService eventTicketingService;
-    private final CustomerService customerService ;
 
     public EventTicketingController(EventTicketingService eventTicketingService, CustomerService customerService) {
         this.eventTicketingService = eventTicketingService;
-        this.customerService = customerService;
 
     }
 

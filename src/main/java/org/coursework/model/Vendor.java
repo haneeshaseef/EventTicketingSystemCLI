@@ -34,11 +34,9 @@ public class Vendor {
     @JsonProperty("active")
     private boolean active;
 
-    // Default constructor
     public Vendor() {
     }
 
-    // Parameterized constructor
     public Vendor(String vendorName, String vendorEmail, String password, int ticketsPerRelease, long ticketReleaseInterval, int ticketsToSell) {
         this.name = vendorName;
         this.email = vendorEmail;

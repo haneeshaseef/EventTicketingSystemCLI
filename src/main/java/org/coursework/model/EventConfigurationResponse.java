@@ -8,22 +8,6 @@ public class EventConfigurationResponse {
     private String eventName;
     private int maxCapacity;
 
-
-    public EventConfigurationResponse() {
-    }
-
-    public EventConfigurationResponse(boolean configured, int ticketReleaseRate,
-                                      int customerRetrievalRate, int availableTickets,
-                                      String eventName, int maxCapacity) {
-        this.configured = configured;
-        this.ticketReleaseRate = ticketReleaseRate;
-        this.customerRetrievalRate = customerRetrievalRate;
-        this.availableTickets = availableTickets;
-        this.eventName = eventName;
-        this.maxCapacity = maxCapacity;
-    }
-
-    // Getters
     public boolean isConfigured() {
         return configured;
     }
@@ -48,7 +32,6 @@ public class EventConfigurationResponse {
         return maxCapacity;
     }
 
-    // Setters
     public void setConfigured(boolean configured) {
         this.configured = configured;
     }
